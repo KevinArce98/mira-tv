@@ -1,3 +1,4 @@
+import { getDemoPlaybackUrl } from '@/services/demo';
 import { XtreamError, type XtreamClient } from '@/services/xtream/client';
 import type { Contenido, Episodio } from '@/types/models';
 
@@ -8,15 +9,22 @@ export function resolvePlaybackUrl(
   contenido: Contenido,
   episodio?: Episodio | null,
 ): string {
+  if (contenido.tipo === 'series' && !episodio) {
+    throw new XtreamError('Para reproducir una serie se debe indicar el episodio.');
+  }
+
+  if (client.demo) {
+    const streamId = contenido.tipo === 'series' ? episodio!.stream_id : contenido.stream_id;
+    const demoUrl = getDemoPlaybackUrl(streamId);
+    if (demoUrl) return demoUrl;
+  }
+
   switch (contenido.tipo) {
     case 'live':
       return client.liveStreamUrl(contenido.stream_id);
     case 'movie':
       return client.movieStreamUrl(contenido.stream_id, contenido.container_extension ?? DEFAULT_EXT);
     case 'series':
-      if (!episodio) {
-        throw new XtreamError('Para reproducir una serie se debe indicar el episodio.');
-      }
-      return client.seriesStreamUrl(episodio.stream_id, episodio.container_extension ?? DEFAULT_EXT);
+      return client.seriesStreamUrl(episodio!.stream_id, episodio!.container_extension ?? DEFAULT_EXT);
   }
 }

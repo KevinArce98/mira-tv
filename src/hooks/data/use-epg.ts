@@ -10,7 +10,7 @@ export function useNowNext(streamId: number, enabled = true) {
   return useQuery({
     queryKey: queryKeys.epg(streamId),
     queryFn: ({ signal }) => client!.shortEpg(streamId, signal),
-    enabled: enabled && !!client,
+    enabled: enabled && !!client && !client.demo,
     staleTime: EPG_TTL_MS,
     gcTime: EPG_TTL_MS,
     retry: false,

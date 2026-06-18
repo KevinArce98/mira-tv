@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { deleteAccount, getAccount, saveAccount, saveDemoAccount } from '@/db/repositories/accounts';
 import { queryKeys } from '@/lib/query-client';
-import { isDemoAccount } from '@/services/demo';
+import { isDemoAccount, syncDemoCatalog } from '@/services/demo';
 import { clientFromAccount } from '@/services/xtream/from-account';
 import { XtreamClient } from '@/services/xtream/client';
 import type { XtreamUserInfo } from '@/types/xtream';
@@ -58,7 +58,11 @@ export function useSaveAccount() {
 export function useSaveDemoAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: saveDemoAccount,
+    mutationFn: async () => {
+      const cuenta = await saveDemoAccount();
+      await syncDemoCatalog(cuenta);
+      return cuenta;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.account }),
   });
 }

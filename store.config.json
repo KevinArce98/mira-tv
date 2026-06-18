@@ -4,9 +4,9 @@
     "info": {
       "es-MX": {
         "title": "Mira TV",
-        "subtitle": "Tu reproductor IPTV personal",
-        "description": "Mira TV es un reproductor para tu proveedor de IPTV compatible con Xtream Codes. Conecta tu cuenta e introduce tus propias credenciales para acceder a tu catálogo: canales en vivo, películas y series.\n\nMira TV no incluye ni distribuye contenido: solo reproduce el catálogo de la cuenta que tú configures. Necesitas una suscripción activa con un proveedor de IPTV propio.\n\nCaracterísticas:\n• Canales en vivo, películas y series desde tu cuenta Xtream\n• Continuar viendo y favoritos\n• Selector de audio y subtítulos\n• Búsqueda y filtrado por categorías\n• Tus credenciales se guardan cifradas en el dispositivo",
-        "keywords": ["iptv", "xtream", "reproductor", "streaming", "tv en vivo", "player", "m3u"],
+        "subtitle": "Reproductor de medios personal",
+        "description": "Mira TV es un reproductor multimedia que se conecta al servidor de medios que tú configures con tus propias credenciales. Accede a tu catálogo personal: canales en vivo, películas y series.\n\nMira TV no incluye ni distribuye ningún contenido: únicamente reproduce el catálogo del servidor que el usuario configura. Necesitas una suscripción activa con tu propio proveedor.\n\nCaracterísticas:\n• Canales en vivo, películas y series desde tu servidor\n• Continuar viendo y favoritos\n• Selector de audio y subtítulos\n• Búsqueda y filtrado por categorías\n• Tus credenciales se guardan cifradas en el dispositivo",
+        "keywords": ["reproductor", "streaming", "tv en vivo", "player", "medios", "servidor"],
         "releaseNotes": "Primera versión de Mira TV.",
         "marketingUrl": "https://kevinarce98.github.io/mira-tv-mobile/privacy/",
         "supportUrl": "https://kevinarce98.github.io/mira-tv-mobile/privacy/",
@@ -14,9 +14,9 @@
       },
       "en-US": {
         "title": "Mira TV",
-        "subtitle": "Your personal IPTV player",
-        "description": "Mira TV is a player for your own Xtream Codes compatible IPTV provider. Connect your account with your own credentials to access your catalog: live channels, movies and series.\n\nMira TV does not include or distribute any content: it only plays the catalog of the account you configure. An active subscription with your own IPTV provider is required.\n\nFeatures:\n• Live channels, movies and series from your Xtream account\n• Continue watching and favorites\n• Audio and subtitle track selection\n• Search and category filtering\n• Your credentials are stored encrypted on the device",
-        "keywords": ["iptv", "xtream", "player", "streaming", "live tv", "m3u"],
+        "subtitle": "Your personal media player",
+        "description": "Mira TV is a media player that connects to the server you configure with your own credentials. Access your personal catalog: live channels, movies and series.\n\nMira TV does not include or distribute any content: it only plays the catalog of the server you configure. An active subscription with your own provider is required.\n\nFeatures:\n• Live channels, movies and series from your server\n• Continue watching and favorites\n• Audio and subtitle track selection\n• Search and category filtering\n• Your credentials are stored encrypted on the device",
+        "keywords": ["player", "streaming", "live tv", "media", "server"],
         "releaseNotes": "First release of Mira TV.",
         "marketingUrl": "https://kevinarce98.github.io/mira-tv-mobile/privacy/",
         "supportUrl": "https://kevinarce98.github.io/mira-tv-mobile/privacy/",
@@ -48,7 +48,7 @@
       "lastName": "Arias",
       "email": "arias9068@gmail.com",
       "phone": "+50684388120",
-      "notes": "Mira TV is a generic IPTV client, comparable to VLC or Infuse. It does not include, host, distribute, or provide any streaming content. The app connects exclusively to Xtream Codes-compatible servers configured by the end user using their own credentials from their own IPTV subscription. The app has no backend infrastructure and no built-in content catalog.\n\nTo review all features without a personal IPTV subscription, please use the built-in DEMO MODE:\n1. On the setup screen, scroll down past the login form.\n2. Tap 'Explore in demo mode' (below the 'or' divider).\n3. The app loads a sample catalog with live channels, movies, and series so all screens and navigation can be reviewed.\n\nNote: In demo mode, playback will show a connection error because there is no real server — all other features (catalog browsing, search, favorites, settings, theme, language) are fully functional."
+      "notes": "GUIDELINE 5.2.3:\nMira TV is a generic media player client, comparable to VLC or Infuse. It does not include, host, distribute, or provide any streaming content or catalog. The app connects exclusively to media servers configured by the end user with their own credentials from their own subscription. The app has no backend infrastructure and no built-in content.\n\nTerms of Use (full text): https://kevinarce98.github.io/mira-tv/terms/ — and also viewable inside the app (setup screen 'Terms of Use' link, and Settings). Sections 3 and 4 state that users are solely responsible for ensuring the content they access is lawfully licensed, and that use with infringing content is expressly prohibited. The setup screen requires the user to check 'I have read and accept the Terms of Use' before any connection can be made.\n\nGUIDELINE 2.1(a) — DEMO MODE WITH PRE-POPULATED, PLAYABLE CONTENT:\nTo review every feature without a personal subscription, use the built-in demo mode:\n1. On the setup screen, check the 'I have read and accept the Terms of Use' box.\n2. Tap 'Explore in demo mode' (below the 'or' divider).\n3. The catalog loads immediately with pre-populated live channels, movies, and series.\n\nThe demo ships ONLY royalty-free, openly licensed content (Blender Foundation open movies under Creative Commons, and standard public test streams). PLAYBACK FULLY WORKS in demo mode — tap any movie, episode, or live channel and it plays. All other features are functional: catalog browsing, search, favorites, continue watching, settings, theme, and language switching."
     }
   }
 }

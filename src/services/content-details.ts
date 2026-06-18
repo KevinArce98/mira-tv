@@ -1,5 +1,6 @@
 import { getAccount } from '@/db/repositories/accounts';
 import { getContentById, updateContentDetails } from '@/db/repositories/content';
+import { isDemoAccount } from '@/services/demo';
 import { XtreamError } from '@/services/xtream/client';
 import { clientFromAccount } from '@/services/xtream/from-account';
 
@@ -45,6 +46,7 @@ export async function loadContentDetails(contentId: string): Promise<ContentDeta
 
   const cuenta = await getAccount();
   if (!cuenta) throw new XtreamError('No hay cuenta configurada.');
+  if (isDemoAccount(cuenta)) return empty;
   const client = await clientFromAccount(cuenta);
 
   let details: ContentDetails;

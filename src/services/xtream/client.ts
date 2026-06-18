@@ -35,11 +35,13 @@ export class XtreamClient {
   private readonly server: string;
   private readonly username: string;
   private readonly password: string;
+  readonly demo: boolean;
 
-  constructor(creds: XtreamCredentials) {
+  constructor(creds: XtreamCredentials, options?: { demo?: boolean }) {
     this.server = normalizeServer(creds.server);
     this.username = creds.username;
     this.password = creds.password;
+    this.demo = options?.demo ?? false;
   }
 
   private apiUrl(params: Record<string, string | number | undefined>): string {

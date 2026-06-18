@@ -1,6 +1,7 @@
 import { getContentById } from '@/db/repositories/content';
 import { listEpisodes, upsertEpisodesBatch, type EpisodeUpsert } from '@/db/repositories/episodes';
 import { getAccount } from '@/db/repositories/accounts';
+import { getDemoEpisodes, isDemoAccount } from '@/services/demo';
 import { clientFromAccount } from '@/services/xtream/from-account';
 import { XtreamError } from '@/services/xtream/client';
 import type { Episodio } from '@/types/models';
@@ -12,6 +13,11 @@ export async function loadSeriesEpisodes(serieId: string): Promise<Episodio[]> {
   }
   const cuenta = await getAccount();
   if (!cuenta) throw new XtreamError('No hay cuenta configurada.');
+
+  if (isDemoAccount(cuenta)) {
+    await upsertEpisodesBatch(getDemoEpisodes(serieId, serie.stream_id));
+    return listEpisodes(serieId);
+  }
 
   const client = await clientFromAccount(cuenta);
   const info = await client.seriesInfo(serie.stream_id);
