@@ -11,8 +11,10 @@ import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useAccount } from '@/hooks/data/use-account';
 import { useCatalog, useCategories } from '@/hooks/data/use-catalog';
 import { openContent } from '@/lib/navigation';
+import { useT } from '@/providers/preferences';
 
 export default function LiveScreen() {
+  const t = useT();
   const { data: account } = useAccount();
   const accountId = account?.id;
 
@@ -21,14 +23,14 @@ export default function LiveScreen() {
   const channels = useCatalog(accountId, 'live', categoriaId);
 
   const options = [
-    { id: undefined as string | undefined, label: 'Todos' },
-    ...(categories.data ?? []).map((c) => ({ id: c.categoria_id ?? undefined, label: c.categoria ?? 'Sin categoría' })),
+    { id: undefined as string | undefined, label: t('live.all') },
+    ...(categories.data ?? []).map((c) => ({ id: c.categoria_id ?? undefined, label: c.categoria ?? t('live.all') })),
   ];
 
   return (
     <ThemedView style={styles.root}>
-      <SafeAreaView style={styles.flex} edges={['top']}>
-        <ScreenTitle title="TV en vivo" />
+      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
+        <ScreenTitle title={t('live.title')} />
 
         <View style={styles.pickerWrap}>
           <CategoryPicker options={options} selectedId={categoriaId} onSelect={setCategoriaId} />
@@ -47,9 +49,9 @@ export default function LiveScreen() {
             renderItem={({ item }) => <ChannelRow channel={item} onPress={() => openContent(item)} />}
             ListEmptyComponent={
               channels.isError ? (
-                <Empty icon="cloud-offline-outline" title="No se pudo cargar" subtitle="Revisa tu conexión e inténtalo de nuevo." />
+                <Empty icon="cloud-offline-outline" title={t('error.loadFailed.title')} subtitle={t('error.loadFailed.subtitle')} />
               ) : (
-                <Empty icon="tv-outline" title="Sin canales" subtitle="Sincroniza el catálogo desde Inicio." />
+                <Empty icon="tv-outline" title={t('live.empty.title')} subtitle={t('live.empty.subtitle')} />
               )
             }
           />

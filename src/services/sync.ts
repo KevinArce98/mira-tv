@@ -1,5 +1,6 @@
 import { updateLastSync } from '@/db/repositories/accounts';
 import { upsertContentBatch, type ContentUpsert } from '@/db/repositories/content';
+import { isDemoAccount, syncDemoCatalog } from '@/services/demo';
 import { clientFromAccount } from '@/services/xtream/from-account';
 import type { XtreamCategory } from '@/types/xtream';
 import type { Cuenta } from '@/types/models';
@@ -22,6 +23,12 @@ export async function syncCatalog(
   onProgress?: SyncProgressCallback,
   signal?: AbortSignal,
 ): Promise<number> {
+  if (isDemoAccount(cuenta)) {
+    const total = await syncDemoCatalog(cuenta);
+    onProgress?.({ stage: 'done', written: total });
+    return total;
+  }
+
   const client = await clientFromAccount(cuenta);
   let written = 0;
 

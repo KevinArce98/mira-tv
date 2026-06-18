@@ -19,3 +19,5 @@ export async function setPreference(clave: string, valor: string | null): Promis
 }
 
 export const PREF_SUBTITLE_LANG = 'subtitle_lang';
+export const PREF_THEME_MODE = 'theme_mode';
+export const PREF_UI_LANGUAGE = 'ui_language';

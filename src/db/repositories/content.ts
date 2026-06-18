@@ -1,6 +1,6 @@
 import { getDatabase } from '@/db';
 import { uuid } from '@/lib/id';
-import type { Contenido, ContentType } from '@/types/models';
+import type { Contenido, ContentSort, ContentType } from '@/types/models';
 
 export type ContentUpsert = Omit<
   Contenido,
@@ -64,8 +64,19 @@ export interface ContentQuery {
   tipo: ContentType;
   categoriaId?: string;
   search?: string;
+  sort?: ContentSort;
   limit?: number;
   offset?: number;
+}
+
+function orderClause(sort: ContentSort = 'nombre_asc'): string {
+  switch (sort) {
+    case 'nombre_desc': return 'nombre COLLATE NOCASE DESC';
+    case 'anio_desc':   return 'CASE WHEN anio IS NULL THEN 1 ELSE 0 END, CAST(anio AS INTEGER) DESC, nombre COLLATE NOCASE ASC';
+    case 'anio_asc':    return 'CASE WHEN anio IS NULL THEN 1 ELSE 0 END, CAST(anio AS INTEGER) ASC, nombre COLLATE NOCASE ASC';
+    case 'reciente':    return 'updated_at DESC';
+    default:            return 'nombre COLLATE NOCASE ASC';
+  }
 }
 
 export async function queryContent(q: ContentQuery): Promise<Contenido[]> {
@@ -84,10 +95,35 @@ export async function queryContent(q: ContentQuery): Promise<Contenido[]> {
   params.push(q.limit ?? 100, q.offset ?? 0);
 
   return db.getAllAsync<Contenido>(
-    `SELECT * FROM contenido WHERE ${where.join(' AND ')}
-     ORDER BY nombre COLLATE NOCASE LIMIT ? OFFSET ?;`,
+    `SELECT * FROM contenido WHERE ${where.join(' AND ')} ORDER BY ${orderClause(q.sort)} LIMIT ? OFFSET ?;`,
     params,
   );
+}
+
+export async function countContent(q: {
+  cuentaId: string;
+  tipo: ContentType;
+  categoriaId?: string;
+  search?: string;
+}): Promise<number> {
+  const db = await getDatabase();
+  const where: string[] = ['cuenta_id = ?', 'tipo = ?'];
+  const params: (string | number)[] = [q.cuentaId, q.tipo];
+
+  if (q.categoriaId) {
+    where.push('categoria_id = ?');
+    params.push(q.categoriaId);
+  }
+  if (q.search) {
+    where.push('nombre LIKE ?');
+    params.push(`%${q.search}%`);
+  }
+
+  const row = await db.getFirstAsync<{ total: number }>(
+    `SELECT COUNT(*) as total FROM contenido WHERE ${where.join(' AND ')};`,
+    params,
+  );
+  return row?.total ?? 0;
 }
 
 export async function searchAllContent(

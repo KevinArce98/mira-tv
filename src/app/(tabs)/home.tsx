@@ -15,18 +15,21 @@ import { useContinueWatching } from '@/hooks/data/use-continue-watching';
 import { useFavorites } from '@/hooks/data/use-favorites';
 import { useAutoSync } from '@/hooks/data/use-sync';
 import { useTheme } from '@/hooks/use-theme';
+import type { TranslationKey } from '@/lib/i18n';
 import { openContent, playContent } from '@/lib/navigation';
+import { useT } from '@/providers/preferences';
 import type { SyncStage } from '@/services/sync';
 
-const SYNC_STAGES: Record<SyncStage, { label: string; fraction: number }> = {
-  live: { label: 'Canales en vivo', fraction: 0.25 },
-  movies: { label: 'Películas', fraction: 0.55 },
-  series: { label: 'Series', fraction: 0.85 },
-  done: { label: 'Finalizando', fraction: 1 },
+const SYNC_STAGES: Record<SyncStage, { labelKey: TranslationKey; fraction: number }> = {
+  live: { labelKey: 'sync.live', fraction: 0.25 },
+  movies: { labelKey: 'sync.movies', fraction: 0.55 },
+  series: { labelKey: 'sync.series', fraction: 0.85 },
+  done: { labelKey: 'sync.done', fraction: 1 },
 };
 
 export default function HomeScreen() {
   const theme = useTheme();
+  const t = useT();
   const { data: account } = useAccount();
   const accountId = account?.id;
 
@@ -62,9 +65,9 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.root}>
-      <SafeAreaView style={styles.flex} edges={['top']}>
+      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
         <ScreenTitle
-          title="Inicio"
+          title={t('home.title')}
           right={
             <View style={styles.actions}>
               <Pressable
@@ -88,7 +91,7 @@ export default function HomeScreen() {
           <View style={styles.syncBanner}>
             <View style={styles.syncRow}>
               <ThemedText type="small" themeColor="textSecondary">
-                Actualizando catálogo · {SYNC_STAGES[sync.progress?.stage ?? 'live'].label}
+                {t('home.syncing', { stage: t(SYNC_STAGES[sync.progress?.stage ?? 'live'].labelKey) })}
               </ThemedText>
               <ThemedText type="small" themeColor="textSecondary">
                 {sync.progress?.written ?? 0}
@@ -110,13 +113,13 @@ export default function HomeScreen() {
           {empty ? (
             <Empty
               icon="play-circle-outline"
-              title="Aún no hay nada aquí"
-              subtitle="Explora el catálogo y empieza a ver contenido para que aparezca en Continuar viendo."
+              title={t('home.empty.title')}
+              subtitle={t('home.empty.subtitle')}
             />
           ) : (
             <>
-              {continueItems.length > 0 ? <ContentRail title="Continuar viendo" items={continueItems} /> : null}
-              {favoriteItems.length > 0 ? <ContentRail title="Favoritos" items={favoriteItems} /> : null}
+              {continueItems.length > 0 ? <ContentRail title={t('home.continueWatching')} items={continueItems} /> : null}
+              {favoriteItems.length > 0 ? <ContentRail title={t('home.favorites')} items={favoriteItems} /> : null}
             </>
           )}
         </ScrollView>

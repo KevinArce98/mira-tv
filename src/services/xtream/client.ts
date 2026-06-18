@@ -132,17 +132,40 @@ export class XtreamClient {
 
   async shortEpg(streamId: number, signal?: AbortSignal): Promise<EpgNowNext> {
     const data = await this.get<XtreamShortEpgResponse | XtreamShortEpgEntry[]>(
-      { action: 'get_short_epg', stream_id: streamId, limit: 2 },
+      { action: 'get_short_epg', stream_id: streamId, limit: 8 },
       signal,
     );
     const listings = Array.isArray(data) ? data : (data?.epg_listings ?? []);
-    const programs: EpgProgram[] = listings.map((e) => ({
-      title: decodeBase64(e.title),
-      description: decodeBase64(e.description),
-      startTimestamp: epgTimestamp(e.start_timestamp, e.start),
-      stopTimestamp: epgTimestamp(e.stop_timestamp, e.end),
-    }));
-    return { now: programs[0] ?? null, next: programs[1] ?? null };
+    const entries = listings
+      .map((e) => ({
+        program: {
+          title: decodeBase64(e.title),
+          description: decodeBase64(e.description),
+          startTimestamp: epgTimestamp(e.start_timestamp, e.start),
+          stopTimestamp: epgTimestamp(e.stop_timestamp, e.end),
+        } as EpgProgram,
+        nowPlaying: Number(e.now_playing) === 1,
+      }))
+      .filter((e) => e.program.title);
+
+    if (entries.length === 0) return { now: null, next: null };
+
+    const nowMs = Date.now();
+    let nowIndex = entries.findIndex((e) => e.nowPlaying);
+    if (nowIndex < 0) {
+      nowIndex = entries.findIndex(
+        (e) =>
+          e.program.startTimestamp > 0 &&
+          e.program.startTimestamp <= nowMs &&
+          (e.program.stopTimestamp === 0 || e.program.stopTimestamp > nowMs),
+      );
+    }
+    if (nowIndex < 0) nowIndex = 0;
+
+    return {
+      now: entries[nowIndex]?.program ?? null,
+      next: entries[nowIndex + 1]?.program ?? null,
+    };
   }
 }
 

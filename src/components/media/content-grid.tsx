@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { PosterCard } from '@/components/media/poster-card';
@@ -22,9 +23,10 @@ export function ContentGrid({
   ListEmptyComponent?: React.ComponentProps<typeof FlatList>['ListEmptyComponent'];
   contentInsetBottom?: number;
 }) {
-  const { width } = useWindowDimensions();
-  const horizontalPadding = Spacing.three * 2;
-  const available = width - horizontalPadding;
+  const { width: windowWidth } = useWindowDimensions();
+  const [measuredWidth, setMeasuredWidth] = useState(0);
+  const containerWidth = measuredWidth > 0 ? measuredWidth : windowWidth;
+  const available = containerWidth - Spacing.three * 2;
   const columns = Math.max(2, Math.floor((available + GAP) / (MIN_CARD_WIDTH + GAP)));
   const cardWidth = (available - GAP * (columns - 1)) / columns;
 
@@ -34,6 +36,7 @@ export function ContentGrid({
       key={columns}
       numColumns={columns}
       keyExtractor={(it) => it.id}
+      onLayout={(e) => setMeasuredWidth(e.nativeEvent.layout.width)}
       ListHeaderComponent={ListHeaderComponent}
       ListEmptyComponent={ListEmptyComponent}
       columnWrapperStyle={{ gap: GAP }}

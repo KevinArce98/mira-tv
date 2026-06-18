@@ -1,5 +1,7 @@
 export type ContentType = 'live' | 'movie' | 'series';
 
+export type ContentSort = 'nombre_asc' | 'nombre_desc' | 'anio_desc' | 'anio_asc' | 'reciente';
+
 export interface Cuenta {
   id: string;
   servidor: string;

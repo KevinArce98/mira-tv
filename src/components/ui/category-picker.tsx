@@ -1,16 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { Fonts, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useT } from '@/providers/preferences';
 
 export interface CategoryOption {
   id: string | undefined;
   label: string;
 }
+
+const OPTION_HEIGHT = 52;
 
 export function CategoryPicker({
   options,
@@ -22,16 +25,31 @@ export function CategoryPicker({
   onSelect: (id: string | undefined) => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const listRef = useRef<FlatList<CategoryOption>>(null);
+  const wasOpen = useRef(false);
 
-  const selectedLabel = options.find((o) => o.id === selectedId)?.label ?? 'Todos';
+  const selectedLabel = options.find((o) => o.id === selectedId)?.label ?? options[0]?.label ?? '';
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return options;
     return options.filter((o) => o.label.toLowerCase().includes(q));
   }, [options, query]);
+
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      const index = options.findIndex((o) => o.id === selectedId);
+      if (index > 0) {
+        setTimeout(() => {
+          listRef.current?.scrollToIndex({ index, viewPosition: 0.5, animated: false });
+        }, 60);
+      }
+    }
+    wasOpen.current = open;
+  }, [open, options, selectedId]);
 
   const close = () => {
     setOpen(false);
@@ -60,7 +78,7 @@ export function CategoryPicker({
         <View style={[styles.sheet, { backgroundColor: theme.background, borderColor: theme.border }]}>
           <SafeAreaView edges={['bottom']} style={styles.sheetInner}>
             <View style={styles.header}>
-              <ThemedText type="subtitle">Categorías</ThemedText>
+              <ThemedText type="subtitle">{t('category.title')}</ThemedText>
               <Pressable onPress={close} hitSlop={12}>
                 <Ionicons name="close" size={24} color={theme.text} />
               </Pressable>
@@ -71,7 +89,7 @@ export function CategoryPicker({
               <TextInput
                 value={query}
                 onChangeText={setQuery}
-                placeholder="Buscar categoría"
+                placeholder={t('category.search')}
                 placeholderTextColor={theme.textSecondary}
                 autoCorrect={false}
                 style={[styles.searchInput, { color: theme.text, fontFamily: Fonts.regular }]}
@@ -79,10 +97,17 @@ export function CategoryPicker({
             </View>
 
             <FlatList
+              ref={listRef}
               data={filtered}
               keyExtractor={(o) => o.id ?? 'all'}
               keyboardShouldPersistTaps="handled"
               initialNumToRender={20}
+              getItemLayout={(_, index) => ({ length: OPTION_HEIGHT, offset: OPTION_HEIGHT * index, index })}
+              onScrollToIndexFailed={({ index }) => {
+                setTimeout(() => {
+                  listRef.current?.scrollToIndex({ index, viewPosition: 0.5, animated: false });
+                }, 80);
+              }}
               style={styles.list}
               contentContainerStyle={styles.listContent}
               renderItem={({ item }) => {
@@ -155,7 +180,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.three,
+    height: OPTION_HEIGHT,
     paddingHorizontal: Spacing.two,
     borderRadius: 10,
   },

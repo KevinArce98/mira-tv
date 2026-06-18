@@ -20,10 +20,12 @@ import { useEpisodes, useSeriesProgress } from '@/hooks/data/use-episodes';
 import { useToggleFavorite } from '@/hooks/data/use-favorites';
 import { useTheme } from '@/hooks/use-theme';
 import { playContent } from '@/lib/navigation';
+import { useT } from '@/providers/preferences';
 import type { Episodio, Progreso } from '@/types/models';
 
 export default function ContentDetailScreen() {
   const theme = useTheme();
+  const t = useT();
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { data: content, isLoading } = useContent(id);
@@ -86,7 +88,7 @@ export default function ContentDetailScreen() {
               style={[styles.playBtn, { backgroundColor: theme.tint }]}>
               <Ionicons name="play" size={18} color={theme.onTint} />
               <ThemedText themeColor="onTint" style={styles.playText}>
-                {resumeSecs > 0 ? 'Reanudar' : 'Reproducir'}
+                {resumeSecs > 0 ? t('detail.resume') : t('detail.play')}
               </ThemedText>
             </Pressable>
           ) : null}
@@ -118,7 +120,7 @@ export default function ContentDetailScreen() {
           <View style={styles.resumeWrap}>
             <ProgressBar value={resumeSecs / total} />
             <ThemedText type="small" themeColor="textSecondary">
-              Vas por {formatSecs(resumeSecs)} de {formatSecs(total)}
+              {t('detail.progress', { current: formatSecs(resumeSecs), total: formatSecs(total) })}
             </ThemedText>
           </View>
         ) : null}
@@ -138,7 +140,7 @@ export default function ContentDetailScreen() {
         {reparto ? (
           <View style={styles.metaRow}>
             <ThemedText type="small" style={styles.metaLabel}>
-              Reparto
+              {t('detail.cast')}
             </ThemedText>
             <ThemedText type="small" themeColor="textSecondary" style={styles.metaValue}>
               {reparto}
@@ -176,11 +178,12 @@ function SeasonsList({
   onToggleWatched: (episodeId: string, completado: boolean) => void;
 }) {
   const theme = useTheme();
+  const t = useT();
   if (loading) return <Loading />;
   if (episodes.length === 0) {
     return (
       <ThemedText type="small" themeColor="textSecondary" style={styles.noEpisodes}>
-        No se encontraron episodios.
+        {t('detail.noEpisodes')}
       </ThemedText>
     );
   }
@@ -197,7 +200,7 @@ function SeasonsList({
       {[...bySeason.entries()].map(([season, eps]) => (
         <Fragment key={season}>
           <ThemedText type="small" style={styles.seasonTitle}>
-            Temporada {season}
+            {t('detail.season', { number: season })}
           </ThemedText>
           {eps.map((ep) => {
             const p = progress[ep.id];
@@ -221,7 +224,7 @@ function SeasonsList({
                     type="small"
                     numberOfLines={1}
                     themeColor={epWatched ? 'textSecondary' : 'text'}>
-                    {ep.titulo ?? `Episodio ${ep.episodio}`}
+                    {ep.titulo ?? t('detail.episode', { number: ep.episodio })}
                   </ThemedText>
                   {fraction > 0 ? (
                     <View style={styles.epProgress}>

@@ -1,8 +1,11 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useKeepAwake } from 'expo-keep-awake';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Video, {
   SelectedTrackType,
   type AudioTrack,
@@ -19,6 +22,8 @@ import Video, {
 import { SeekBar } from '@/components/media/seek-bar';
 import { Fonts } from '@/constants/theme';
 import { languageLabel } from '@/lib/language';
+import { usePreferences } from '@/providers/preferences';
+import type { TranslationKey } from '@/lib/i18n';
 import { getNextEpisode } from '@/db/repositories/episodes';
 import { setCompleted } from '@/db/repositories/progress';
 import { useContent, useProgressFor } from '@/hooks/data/use-content';
@@ -33,12 +38,14 @@ const SYSTEM_AUDIO: SelectedTrack = { type: SelectedTrackType.SYSTEM };
 const SKIP_SECONDS = 10;
 const HIDE_DELAY = 3500;
 
-function audioTrackLabel(track: AudioTrack): string {
-  return track.title || languageLabel(track.language) || `Pista ${track.index + 1}`;
+type Translate = (key: TranslationKey, vars?: Record<string, string | number>) => string;
+
+function audioTrackLabel(track: AudioTrack, t: Translate): string {
+  return track.title || languageLabel(track.language) || t('player.track', { number: track.index + 1 });
 }
 
-function textTrackLabel(track: TextTrack): string {
-  return track.title || languageLabel(track.language) || `Pista ${track.index + 1}`;
+function textTrackLabel(track: TextTrack, t: Translate): string {
+  return track.title || languageLabel(track.language) || t('player.track', { number: track.index + 1 });
 }
 
 function formatTime(seconds: number): string {
@@ -58,13 +65,29 @@ export default function PlayerScreen() {
 }
 
 function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: string }) {
+  useKeepAwake();
+
+  useFocusEffect(
+    useCallback(() => {
+      ScreenOrientation.unlockAsync();
+      return () => {
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+      };
+    }, []),
+  );
+
+  const { t } = usePreferences();
   const { data: content } = useContent(contentId);
   const { data: episode } = useEpisode(episodeId);
   const { data: client } = useXtreamClient();
   const { data: progress } = useProgressFor(contentId, episodeId ?? null);
   const { lang: preferredLang, setLang } = useSubtitleLang();
 
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
   const isLive = content?.tipo === 'live';
+
   const tracker = useProgressTracker({
     contentId,
     episodeId: episodeId ?? null,
@@ -80,6 +103,7 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const seekedRef = useRef(false);
 
+  const [isLoaded, setIsLoaded] = useState(false);
   const [paused, setPaused] = useState(false);
   const [buffering, setBuffering] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -133,6 +157,7 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
   }, [content?.tipo, episode]);
 
   const onLoad = (data: OnLoadData) => {
+    setIsLoaded(true);
     if (data.duration && Number.isFinite(data.duration)) setDuration(data.duration);
     else if (episode?.duracion) setDuration(episode.duracion);
     if (!isLive && progress?.posicion_segundos && progress.posicion_segundos > 5 && !seekedRef.current) {
@@ -161,7 +186,7 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
 
   const onError = (e: OnVideoErrorData) => {
     const detail =
-      e.error?.localizedDescription || e.error?.errorString || e.error?.error || 'Error de reproducción';
+      e.error?.localizedDescription || e.error?.errorString || e.error?.error || t('player.error');
     setPlaybackError(detail);
   };
 
@@ -250,6 +275,7 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
 
   return (
     <View style={styles.root}>
+      <StatusBar hidden />
       <Video
         ref={videoRef}
         source={{ uri: url }}
@@ -268,6 +294,12 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
         progressUpdateInterval={1000}
       />
 
+      {!isLoaded ? (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator color="#fff" size="large" />
+        </View>
+      ) : null}
+
       <Pressable style={StyleSheet.absoluteFill} onPress={toggleControls} />
 
       {playbackError ? (
@@ -278,31 +310,8 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
       ) : null}
 
       {controlsVisible ? (
-        <SafeAreaView style={styles.overlay} pointerEvents="box-none">
+        <View style={styles.overlay} pointerEvents="box-none">
           <View style={styles.scrim} pointerEvents="none" />
-
-          <View style={styles.topBar} pointerEvents="box-none">
-            <Pressable onPress={close} hitSlop={12} style={styles.iconButton}>
-              <Ionicons name="chevron-down" size={28} color="#fff" />
-            </Pressable>
-            <View style={styles.titleBox} pointerEvents="none">
-              <Text style={styles.title} numberOfLines={1}>
-                {content?.nombre ?? ''}
-              </Text>
-              {subtitleLabel ? (
-                <Text style={styles.subtitle} numberOfLines={1}>
-                  {subtitleLabel}
-                </Text>
-              ) : null}
-            </View>
-            {hasTrackMenu ? (
-              <Pressable onPress={() => setMenuOpen(true)} hitSlop={12} style={styles.iconButton}>
-                <Ionicons name="options-outline" size={24} color="#fff" />
-              </Pressable>
-            ) : (
-              <View style={styles.iconButton} />
-            )}
-          </View>
 
           <View style={styles.center} pointerEvents="box-none">
             {buffering ? (
@@ -326,11 +335,48 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
             )}
           </View>
 
-          <View style={styles.bottomBar} pointerEvents="box-none">
+          <View
+            style={[styles.topBar, {
+              paddingTop: isLandscape ? 4 : Math.max(insets.top, 8),
+              paddingLeft: Math.max(insets.left, 12),
+              paddingRight: Math.max(insets.right, 12),
+              paddingBottom: 8,
+            }]}
+            pointerEvents="box-none">
+            <Pressable onPress={close} hitSlop={12} style={styles.iconButton}>
+              <Ionicons name="chevron-down" size={28} color="#fff" />
+            </Pressable>
+            <View style={styles.titleBox} pointerEvents="none">
+              <Text style={styles.title} numberOfLines={1}>
+                {content?.nombre ?? ''}
+              </Text>
+              {subtitleLabel ? (
+                <Text style={styles.subtitle} numberOfLines={1}>
+                  {subtitleLabel}
+                </Text>
+              ) : null}
+            </View>
+            {hasTrackMenu ? (
+              <Pressable onPress={() => setMenuOpen(true)} hitSlop={12} style={styles.iconButton}>
+                <Ionicons name="options-outline" size={24} color="#fff" />
+              </Pressable>
+            ) : (
+              <View style={styles.iconButton} />
+            )}
+          </View>
+
+          <View
+            style={[styles.bottomBar, {
+              paddingBottom: Math.max(insets.bottom, 8),
+              paddingLeft: Math.max(insets.left, 16),
+              paddingRight: Math.max(insets.right, 16),
+              paddingTop: 8,
+            }]}
+            pointerEvents="box-none">
             {isLive ? (
               <View style={styles.liveBadge}>
                 <View style={styles.liveDot} />
-                <Text style={styles.liveText}>EN VIVO</Text>
+                <Text style={styles.liveText}>{t('player.live')}</Text>
               </View>
             ) : (
               <View style={styles.seekRow} pointerEvents="box-none">
@@ -354,7 +400,7 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
               </View>
             )}
           </View>
-        </SafeAreaView>
+        </View>
       ) : null}
 
       <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
@@ -362,12 +408,12 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
           <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
             {audioTracks.length > 1 ? (
               <>
-                <Text style={styles.sheetTitle}>Audio</Text>
-                {audioTracks.map((t) => {
-                  const isSelected = audioSelected(t);
+                <Text style={styles.sheetTitle}>{t('player.audio')}</Text>
+                {audioTracks.map((track) => {
+                  const isSelected = audioSelected(track);
                   return (
-                    <Pressable key={`a-${t.index}`} style={styles.sheetRow} onPress={() => chooseAudio(t)}>
-                      <Text style={styles.sheetText}>{audioTrackLabel(t)}</Text>
+                    <Pressable key={`a-${track.index}`} style={styles.sheetRow} onPress={() => chooseAudio(track)}>
+                      <Text style={styles.sheetText}>{audioTrackLabel(track, t)}</Text>
                       {isSelected ? <Ionicons name="checkmark" size={20} color="#fff" /> : null}
                     </Pressable>
                   );
@@ -377,19 +423,21 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
 
             {textTracks.length > 0 ? (
               <>
-                <Text style={[styles.sheetTitle, audioTracks.length > 1 && styles.sheetTitleSpaced]}>Subtítulos</Text>
+                <Text style={[styles.sheetTitle, audioTracks.length > 1 && styles.sheetTitleSpaced]}>
+                  {t('player.subtitles')}
+                </Text>
                 <Pressable style={styles.sheetRow} onPress={() => chooseTrack(null)}>
-                  <Text style={styles.sheetText}>Desactivados</Text>
+                  <Text style={styles.sheetText}>{t('player.off')}</Text>
                   {selectedTrack.type === SelectedTrackType.DISABLED ? (
                     <Ionicons name="checkmark" size={20} color="#fff" />
                   ) : null}
                 </Pressable>
-                {textTracks.map((t) => {
+                {textTracks.map((track) => {
                   const isSelected =
-                    selectedTrack.type === SelectedTrackType.LANGUAGE && selectedTrack.value === t.language;
+                    selectedTrack.type === SelectedTrackType.LANGUAGE && selectedTrack.value === track.language;
                   return (
-                    <Pressable key={`s-${t.index}`} style={styles.sheetRow} onPress={() => chooseTrack(t)}>
-                      <Text style={styles.sheetText}>{textTrackLabel(t)}</Text>
+                    <Pressable key={`s-${track.index}`} style={styles.sheetRow} onPress={() => chooseTrack(track)}>
+                      <Text style={styles.sheetText}>{textTrackLabel(track, t)}</Text>
                       {isSelected ? <Ionicons name="checkmark" size={20} color="#fff" /> : null}
                     </Pressable>
                   );
@@ -406,14 +454,17 @@ function PlayerView({ contentId, episodeId }: { contentId: string; episodeId?: s
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#000' },
   loading: { flex: 1, backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' },
-  overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'space-between' },
+  loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' },
+  overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   scrim: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.35)' },
   topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 12,
-    paddingTop: 8,
   },
   titleBox: { flex: 1 },
   title: { color: '#fff', fontSize: 16, fontFamily: Fonts.displaySemibold },
@@ -426,7 +477,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  center: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   centerRow: { flexDirection: 'row', alignItems: 'center', gap: 36 },
   skipButton: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center' },
   playButton: {
@@ -437,7 +488,7 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     backgroundColor: 'rgba(0,0,0,0.45)',
   },
-  bottomBar: { paddingHorizontal: 16, paddingBottom: 8 },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0 },
   seekRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   seekBarWrap: { flex: 1 },
   time: { color: '#fff', fontSize: 13, fontFamily: Fonts.medium, fontVariant: ['tabular-nums'], minWidth: 44, textAlign: 'center' },

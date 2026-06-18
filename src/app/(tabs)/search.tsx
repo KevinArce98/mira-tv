@@ -12,9 +12,11 @@ import { useAccount } from '@/hooks/data/use-account';
 import { useSearch } from '@/hooks/data/use-catalog';
 import { useTheme } from '@/hooks/use-theme';
 import { openContent } from '@/lib/navigation';
+import { useT } from '@/providers/preferences';
 
 export default function SearchScreen() {
   const theme = useTheme();
+  const t = useT();
   const { data: account } = useAccount();
 
   const [term, setTerm] = useState('');
@@ -30,14 +32,14 @@ export default function SearchScreen() {
 
   return (
     <ThemedView style={styles.root}>
-      <SafeAreaView style={styles.flex} edges={['top']}>
-        <ScreenTitle title="Buscar" />
+      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
+        <ScreenTitle title={t('search.title')} />
 
         <View style={[styles.searchBar, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}>
           <Ionicons name="search" size={18} color={theme.textSecondary} />
           <TextInput
             style={[styles.input, { color: theme.text }]}
-            placeholder="Canales, películas, series…"
+            placeholder={t('search.placeholder')}
             placeholderTextColor={theme.textSecondary}
             autoCapitalize="none"
             autoCorrect={false}
@@ -48,7 +50,7 @@ export default function SearchScreen() {
         </View>
 
         {!hasQuery ? (
-          <Empty icon="search-outline" title="Busca en todo tu catálogo" subtitle="Escribe al menos 2 caracteres." />
+          <Empty icon="search-outline" title={t('search.prompt.title')} subtitle={t('search.prompt.subtitle')} />
         ) : results.isLoading ? (
           <Loading />
         ) : (
@@ -56,7 +58,13 @@ export default function SearchScreen() {
             items={results.data ?? []}
             onPressItem={openContent}
             contentInsetBottom={BottomTabInset}
-            ListEmptyComponent={<Empty icon="sad-outline" title="Sin resultados" subtitle={`No se encontró "${debounced}".`} />}
+            ListEmptyComponent={
+              <Empty
+                icon="sad-outline"
+                title={t('search.noResults.title')}
+                subtitle={t('search.noResults.subtitle', { query: debounced })}
+              />
+            }
           />
         )}
       </SafeAreaView>

@@ -1,5 +1,6 @@
 import { getDatabase } from '@/db';
 import { uuid } from '@/lib/id';
+import { DEMO_SERVER } from '@/services/demo';
 import { deletePassword, savePassword } from '@/services/credentials';
 import type { Cuenta } from '@/types/models';
 
@@ -32,6 +33,10 @@ export async function saveAccount(input: {
     usuario: input.usuario,
     ultima_sincronizacion: existing?.ultima_sincronizacion ?? null,
   };
+}
+
+export async function saveDemoAccount(): Promise<Cuenta> {
+  return saveAccount({ servidor: DEMO_SERVER, usuario: 'demo', password: 'demo' });
 }
 
 export async function updateLastSync(accountId: string, when: number = Date.now()): Promise<void> {

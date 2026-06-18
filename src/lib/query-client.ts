@@ -12,7 +12,10 @@ export const queryClient = new QueryClient({
 
 export const queryKeys = {
   account: ['account'] as const,
-  catalog: (tipo: string, categoriaId?: string) => ['catalog', tipo, categoriaId ?? 'all'] as const,
+  catalog: (tipo: string, categoriaId?: string, sort?: string) =>
+    ['catalog', tipo, categoriaId ?? 'all', sort ?? 'nombre_asc'] as const,
+  catalogCount: (tipo: string, categoriaId?: string) =>
+    ['catalog-count', tipo, categoriaId ?? 'all'] as const,
   categories: (tipo: string) => ['categories', tipo] as const,
   search: (term: string) => ['search', term] as const,
   continueWatching: ['continue-watching'] as const,

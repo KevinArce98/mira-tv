@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Fonts, Spacing } from '@/constants/theme';
 import { useNowNext } from '@/hooks/data/use-epg';
 import { useTheme } from '@/hooks/use-theme';
+import { useT } from '@/providers/preferences';
 import type { Contenido } from '@/types/models';
 
 function formatTime(ts: number): string {
@@ -15,8 +16,8 @@ function formatTime(ts: number): string {
 
 function ChannelRowBase({ channel, onPress }: { channel: Contenido; onPress: () => void }) {
   const theme = useTheme();
-  const hasEpg = !!channel.epg_channel_id;
-  const { data: epg } = useNowNext(channel.stream_id, hasEpg);
+  const t = useT();
+  const { data: epg } = useNowNext(channel.stream_id);
 
   return (
     <Pressable
@@ -35,16 +36,16 @@ function ChannelRowBase({ channel, onPress }: { channel: Contenido; onPress: () 
         </ThemedText>
         {epg?.now ? (
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            {formatTime(epg.now.startTimestamp)} · {epg.now.title}
+            {epg.now.startTimestamp ? `${formatTime(epg.now.startTimestamp)} · ` : ''}{epg.now.title}
           </ThemedText>
         ) : (
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            Sin guía disponible
+            {t('channel.noGuide')}
           </ThemedText>
         )}
         {epg?.next ? (
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1} style={styles.next}>
-            Después: {epg.next.title}
+            {t('channel.next', { title: epg.next.title })}
           </ThemedText>
         ) : null}
       </View>

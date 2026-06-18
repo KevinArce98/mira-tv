@@ -16,26 +16,34 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts, Spacing } from '@/constants/theme';
-import { useSaveAccount } from '@/hooks/data/use-account';
+import { useSaveAccount, useSaveDemoAccount } from '@/hooks/data/use-account';
 import { useTheme } from '@/hooks/use-theme';
+import { useT } from '@/providers/preferences';
 
 export default function SetupScreen() {
   const theme = useTheme();
+  const t = useT();
   const router = useRouter();
   const save = useSaveAccount();
+  const saveDemo = useSaveDemoAccount();
 
   const [servidor, setServidor] = useState('');
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const canSubmit = servidor.trim() && usuario.trim() && password.trim() && !save.isPending;
+  const isAnyPending = save.isPending || saveDemo.isPending;
+  const canSubmit = servidor.trim() && usuario.trim() && password.trim() && !isAnyPending;
 
   const onSubmit = () => {
     save.mutate(
       { servidor: servidor.trim(), usuario: usuario.trim(), password },
       { onSuccess: () => router.replace('/(tabs)/home') },
     );
+  };
+
+  const onDemoPress = () => {
+    saveDemo.mutate(undefined, { onSuccess: () => router.replace('/(tabs)/home') });
   };
 
   const inputStyle = [
@@ -55,14 +63,14 @@ export default function SetupScreen() {
               Mira<Text style={{ color: theme.accent }}> TV</Text>
             </ThemedText>
             <ThemedText type="subtitle" style={styles.heading}>
-              Conecta tu cuenta
+              {t('setup.connect')}
             </ThemedText>
             <ThemedText type="small" themeColor="textSecondary" style={styles.sub}>
-              Introduce los datos de tu proveedor Xtream Codes.
+              {t('setup.subtitle')}
             </ThemedText>
 
             <ThemedText type="small" style={styles.label}>
-              Servidor
+              {t('setup.server')}
             </ThemedText>
             <TextInput
               style={inputStyle}
@@ -77,7 +85,7 @@ export default function SetupScreen() {
             />
 
             <ThemedText type="small" style={styles.label}>
-              Usuario
+              {t('setup.user')}
             </ThemedText>
             <TextInput
               style={inputStyle}
@@ -90,7 +98,7 @@ export default function SetupScreen() {
             />
 
             <ThemedText type="small" style={styles.label}>
-              Contraseña
+              {t('setup.password')}
             </ThemedText>
             <ThemedView style={styles.passwordWrap}>
               <TextInput
@@ -108,14 +116,14 @@ export default function SetupScreen() {
                 hitSlop={12}
                 style={styles.eye}
                 accessibilityRole="button"
-                accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
+                accessibilityLabel={showPassword ? t('setup.hidePassword') : t('setup.showPassword')}>
                 <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color={theme.textSecondary} />
               </Pressable>
             </ThemedView>
 
             {save.isError ? (
               <ThemedText type="small" themeColor="danger" style={styles.error}>
-                {save.error instanceof Error ? save.error.message : 'No se pudo conectar.'}
+                {save.error instanceof Error ? save.error.message : t('setup.connectError')}
               </ThemedText>
             ) : null}
 
@@ -127,14 +135,39 @@ export default function SetupScreen() {
                 <ActivityIndicator color={theme.onTint} />
               ) : (
                 <ThemedText themeColor="onTint" style={styles.buttonText}>
-                  Conectar
+                  {t('setup.submit')}
                 </ThemedText>
               )}
             </Pressable>
 
             <ThemedText type="small" themeColor="textSecondary" style={styles.note}>
-              Tu contraseña se guarda cifrada en el dispositivo.
+              {t('setup.note')}
             </ThemedText>
+
+            <ThemedView style={styles.dividerRow}>
+              <ThemedView style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+              <ThemedText type="small" themeColor="textSecondary" style={styles.dividerLabel}>
+                {t('setup.or')}
+              </ThemedText>
+              <ThemedView style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+            </ThemedView>
+
+            <ThemedText type="small" themeColor="textSecondary" style={styles.demoNote}>
+              {t('setup.demoNote')}
+            </ThemedText>
+
+            <Pressable
+              onPress={onDemoPress}
+              disabled={isAnyPending}
+              style={[styles.demoButton, { borderColor: theme.border, opacity: isAnyPending ? 0.5 : 1 }]}>
+              {saveDemo.isPending ? (
+                <ActivityIndicator color={theme.textSecondary} />
+              ) : (
+                <ThemedText type="small" themeColor="textSecondary" style={styles.buttonText}>
+                  {t('setup.demoButton')}
+                </ThemedText>
+              )}
+            </Pressable>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -178,4 +211,15 @@ const styles = StyleSheet.create({
   },
   buttonText: { fontFamily: Fonts.bold, fontSize: 16 },
   note: { textAlign: 'center', marginTop: Spacing.three },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, marginTop: Spacing.four },
+  dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
+  dividerLabel: { paddingHorizontal: Spacing.one },
+  demoNote: { textAlign: 'center' },
+  demoButton: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: Spacing.two,
+    paddingVertical: Spacing.three,
+    alignItems: 'center',
+    marginBottom: Spacing.two,
+  },
 });

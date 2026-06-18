@@ -2,9 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 
 import { useTheme } from '@/hooks/use-theme';
+import { useT } from '@/providers/preferences';
 
 export default function TabsLayout() {
   const theme = useTheme();
+  const t = useT();
   return (
     <Tabs
       screenOptions={{
@@ -16,35 +18,35 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Inicio',
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="live"
         options={{
-          title: 'TV',
+          title: t('tabs.live'),
           tabBarIcon: ({ color, size }) => <Ionicons name="tv" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="movies"
         options={{
-          title: 'Películas',
+          title: t('tabs.movies'),
           tabBarIcon: ({ color, size }) => <Ionicons name="film" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="series"
         options={{
-          title: 'Series',
+          title: t('tabs.series'),
           tabBarIcon: ({ color, size }) => <Ionicons name="albums" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Buscar',
+          title: t('tabs.search'),
           tabBarIcon: ({ color, size }) => <Ionicons name="search" size={size} color={color} />,
         }}
       />

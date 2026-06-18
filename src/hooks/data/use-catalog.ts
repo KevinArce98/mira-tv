@@ -1,17 +1,35 @@
 import { useQuery } from '@tanstack/react-query';
 
 import {
+  countContent,
   listCategories,
   queryContent,
   searchAllContent,
 } from '@/db/repositories/content';
 import { queryKeys } from '@/lib/query-client';
-import type { ContentType } from '@/types/models';
+import type { ContentSort, ContentType } from '@/types/models';
 
-export function useCatalog(cuentaId: string | undefined, tipo: ContentType, categoriaId?: string) {
+export function useCatalog(
+  cuentaId: string | undefined,
+  tipo: ContentType,
+  categoriaId?: string,
+  sort: ContentSort = 'nombre_asc',
+) {
   return useQuery({
-    queryKey: queryKeys.catalog(tipo, categoriaId),
-    queryFn: () => queryContent({ cuentaId: cuentaId!, tipo, categoriaId, limit: 500 }),
+    queryKey: queryKeys.catalog(tipo, categoriaId, sort),
+    queryFn: () => queryContent({ cuentaId: cuentaId!, tipo, categoriaId, sort, limit: 500 }),
+    enabled: !!cuentaId,
+  });
+}
+
+export function useCatalogCount(
+  cuentaId: string | undefined,
+  tipo: ContentType,
+  categoriaId?: string,
+) {
+  return useQuery({
+    queryKey: queryKeys.catalogCount(tipo, categoriaId),
+    queryFn: () => countContent({ cuentaId: cuentaId!, tipo, categoriaId }),
     enabled: !!cuentaId,
   });
 }

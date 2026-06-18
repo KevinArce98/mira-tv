@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { deleteAccount, getAccount, saveAccount } from '@/db/repositories/accounts';
+import { deleteAccount, getAccount, saveAccount, saveDemoAccount } from '@/db/repositories/accounts';
 import { queryKeys } from '@/lib/query-client';
+import { isDemoAccount } from '@/services/demo';
 import { clientFromAccount } from '@/services/xtream/from-account';
 import { XtreamClient } from '@/services/xtream/client';
 import type { XtreamUserInfo } from '@/types/xtream';
@@ -20,7 +21,7 @@ export function useAccountStatus() {
     queryKey: ['account-status'],
     queryFn: async () => {
       const cuenta = await getAccount();
-      if (!cuenta) return null;
+      if (!cuenta || isDemoAccount(cuenta)) return null;
       const client = await clientFromAccount(cuenta);
       const auth = await client.authenticate();
       return auth.user_info;
@@ -51,6 +52,14 @@ export function useSaveAccount() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.account });
     },
+  });
+}
+
+export function useSaveDemoAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: saveDemoAccount,
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.account }),
   });
 }
 

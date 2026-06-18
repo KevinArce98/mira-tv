@@ -2,7 +2,7 @@
   "configVersion": 0,
   "apple": {
     "info": {
-      "es-ES": {
+      "es-MX": {
         "title": "Mira TV",
         "subtitle": "Tu reproductor IPTV personal",
         "description": "Mira TV es un reproductor para tu proveedor de IPTV compatible con Xtream Codes. Conecta tu cuenta e introduce tus propias credenciales para acceder a tu catálogo: canales en vivo, películas y series.\n\nMira TV no incluye ni distribuye contenido: solo reproduce el catálogo de la cuenta que tú configures. Necesitas una suscripción activa con un proveedor de IPTV propio.\n\nCaracterísticas:\n• Canales en vivo, películas y series desde tu cuenta Xtream\n• Continuar viendo y favoritos\n• Selector de audio y subtítulos\n• Búsqueda y filtrado por categorías\n• Tus credenciales se guardan cifradas en el dispositivo",
@@ -10,8 +10,7 @@
         "releaseNotes": "Primera versión de Mira TV.",
         "marketingUrl": "https://kevinarce98.github.io/mira-tv/privacy/",
         "supportUrl": "https://kevinarce98.github.io/mira-tv/privacy/",
-        "privacyPolicyUrl": "https://kevinarce98.github.io/mira-tv/privacy/",
-        "termsOfServiceUrl": "https://kevinarce98.github.io/mira-tv/terms/"
+        "privacyPolicyUrl": "https://kevinarce98.github.io/mira-tv/privacy/"
       },
       "en-US": {
         "title": "Mira TV",
@@ -21,8 +20,7 @@
         "releaseNotes": "First release of Mira TV.",
         "marketingUrl": "https://kevinarce98.github.io/mira-tv/privacy/",
         "supportUrl": "https://kevinarce98.github.io/mira-tv/privacy/",
-        "privacyPolicyUrl": "https://kevinarce98.github.io/mira-tv/privacy/",
-        "termsOfServiceUrl": "https://kevinarce98.github.io/mira-tv/terms/"
+        "privacyPolicyUrl": "https://kevinarce98.github.io/mira-tv/privacy/"
       }
     },
     "categories": ["ENTERTAINMENT"],
@@ -41,16 +39,16 @@
       "violenceRealisticProlongedGraphicOrSadistic": "NONE",
       "gambling": false,
       "unrestrictedWebAccess": false,
-      "kidsAgeBand": null
+      "kidsAgeBand": null,
+      "ageRatingOverride": "NONE",
+      "koreaAgeRatingOverride": "NONE"
     },
     "review": {
       "firstName": "Kevin",
       "lastName": "Arias",
       "email": "arias9068@gmail.com",
-      "phone": "REEMPLAZAR_+502...",
-      "demoUsername": "REEMPLAZAR_usuario_demo",
-      "demoPassword": "REEMPLAZAR_password_demo",
-      "notes": "Mira TV es solo un reproductor. Requiere una cuenta de un proveedor IPTV (Xtream Codes) que el usuario configura. La app no incluye contenido. Credenciales demo arriba; servidor de prueba: REEMPLAZAR_http://host:puerto"
+      "phone": "+50684388120",
+      "notes": "Mira TV is a generic IPTV client, comparable to VLC or Infuse. It does not include, host, distribute, or provide any streaming content. The app connects exclusively to Xtream Codes-compatible servers configured by the end user using their own credentials from their own IPTV subscription. The app has no backend infrastructure and no built-in content catalog.\n\nTo review all features without a personal IPTV subscription, please use the built-in DEMO MODE:\n1. On the setup screen, scroll down past the login form.\n2. Tap 'Explore in demo mode' (below the 'or' divider).\n3. The app loads a sample catalog with live channels, movies, and series so all screens and navigation can be reviewed.\n\nNote: In demo mode, playback will show a connection error because there is no real server — all other features (catalog browsing, search, favorites, settings, theme, language) are fully functional."
     }
   }
 }
