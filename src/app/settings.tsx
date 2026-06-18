@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { router, useRouter } from 'expo-router';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -33,6 +33,7 @@ function statusLabel(s: string | undefined, t: Translate): string {
 
 export default function SettingsScreen() {
   const theme = useTheme();
+  const nav = useRouter();
   const { t, themeMode, setThemeMode, language, setLanguage } = usePreferences();
   const locale = localeFor(language);
   const { data: account } = useAccount();
@@ -126,6 +127,15 @@ export default function SettingsScreen() {
           <Ionicons name="refresh" size={18} color={theme.onTint} />
           <ThemedText themeColor="onTint" style={styles.buttonText}>
             {sync.isPending ? t('settings.syncing', { count: sync.progress?.written ?? 0 }) : t('settings.syncNow')}
+          </ThemedText>
+        </Pressable>
+
+        <Pressable
+          onPress={() => Linking.openURL('https://kevinarce98.github.io/mira-tv-mobile/terms/')}
+          style={[styles.button, styles.outline, { borderColor: theme.border }]}>
+          <Ionicons name="document-text-outline" size={18} color={theme.textSecondary} />
+          <ThemedText type="small" themeColor="textSecondary" style={styles.buttonText}>
+            {t('settings.legal')}
           </ThemedText>
         </Pressable>
 

@@ -66,12 +66,15 @@ const es = {
   'setup.connectError': 'No se pudo conectar.',
   'setup.showPassword': 'Mostrar contraseña',
   'setup.hidePassword': 'Ocultar contraseña',
+  'setup.legalCheckbox': 'He leído y acepto los ',
+  'setup.legalTermsLink': 'Términos de Uso',
   'setup.or': 'o',
   'setup.demoButton': 'Explorar en modo demo',
   'setup.demoNote': '¿No tienes cuenta propia? Explora la interfaz con datos de ejemplo.',
 
   'settings.demoMode': 'Modo demo activo',
   'settings.demoDescription': 'Los datos son de ejemplo. Cierra sesión y conecta tu cuenta para usar Mira TV.',
+  'settings.legal': 'Términos de Uso',
 
   'detail.resume': 'Reanudar',
   'detail.play': 'Reproducir',
@@ -189,12 +192,15 @@ const en: Dictionary = {
   'setup.connectError': 'Could not connect.',
   'setup.showPassword': 'Show password',
   'setup.hidePassword': 'Hide password',
+  'setup.legalCheckbox': 'I have read and accept the ',
+  'setup.legalTermsLink': 'Terms of Use',
   'setup.or': 'or',
   'setup.demoButton': 'Explore in demo mode',
   'setup.demoNote': "Don't have your own account? Explore the interface with sample data.",
 
   'settings.demoMode': 'Demo mode active',
   'settings.demoDescription': 'Data is for demonstration only. Log out and connect your account to use Mira TV.',
+  'settings.legal': 'Terms of Use',
 
   'detail.resume': 'Resume',
   'detail.play': 'Play',

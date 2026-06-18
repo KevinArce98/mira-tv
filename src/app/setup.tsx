@@ -4,12 +4,14 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -31,9 +33,11 @@ export default function SetupScreen() {
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const isAnyPending = save.isPending || saveDemo.isPending;
-  const canSubmit = servidor.trim() && usuario.trim() && password.trim() && !isAnyPending;
+  const canSubmit = servidor.trim() && usuario.trim() && password.trim() && termsAccepted && !isAnyPending;
+  const canDemo = termsAccepted && !isAnyPending;
 
   const onSubmit = () => {
     save.mutate(
@@ -117,7 +121,11 @@ export default function SetupScreen() {
                 style={styles.eye}
                 accessibilityRole="button"
                 accessibilityLabel={showPassword ? t('setup.hidePassword') : t('setup.showPassword')}>
-                <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color={theme.textSecondary} />
+                <Ionicons
+                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={22}
+                  color={theme.textSecondary}
+                />
               </Pressable>
             </ThemedView>
 
@@ -128,9 +136,30 @@ export default function SetupScreen() {
             ) : null}
 
             <Pressable
+              onPress={() => setTermsAccepted((v) => !v)}
+              style={styles.checkboxRow}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: termsAccepted }}>
+              <Ionicons
+                name={termsAccepted ? 'checkbox' : 'square-outline'}
+                size={22}
+                color={termsAccepted ? theme.tint : theme.textSecondary}
+                style={styles.checkboxIcon}
+              />
+              <Text style={[styles.checkboxLabel, { color: theme.textSecondary }]}>
+                {t('setup.legalCheckbox')}
+                <Text
+                  style={{ color: theme.accent, fontFamily: Fonts.semibold }}
+                  onPress={() => Linking.openURL('https://kevinarce98.github.io/mira-tv-mobile/terms/')}>
+                  {t('setup.legalTermsLink')}
+                </Text>
+              </Text>
+            </Pressable>
+
+            <Pressable
               onPress={onSubmit}
               disabled={!canSubmit}
-              style={[styles.button, { backgroundColor: theme.tint, opacity: canSubmit ? 1 : 0.5 }]}>
+              style={[styles.button, { backgroundColor: theme.tint, opacity: canSubmit ? 1 : 0.4 }]}>
               {save.isPending ? (
                 <ActivityIndicator color={theme.onTint} />
               ) : (
@@ -144,13 +173,13 @@ export default function SetupScreen() {
               {t('setup.note')}
             </ThemedText>
 
-            <ThemedView style={styles.dividerRow}>
-              <ThemedView style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+            <View style={styles.dividerRow}>
+              <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
               <ThemedText type="small" themeColor="textSecondary" style={styles.dividerLabel}>
                 {t('setup.or')}
               </ThemedText>
-              <ThemedView style={[styles.dividerLine, { backgroundColor: theme.border }]} />
-            </ThemedView>
+              <View style={[styles.dividerLine, { backgroundColor: theme.border }]} />
+            </View>
 
             <ThemedText type="small" themeColor="textSecondary" style={styles.demoNote}>
               {t('setup.demoNote')}
@@ -158,8 +187,8 @@ export default function SetupScreen() {
 
             <Pressable
               onPress={onDemoPress}
-              disabled={isAnyPending}
-              style={[styles.demoButton, { borderColor: theme.border, opacity: isAnyPending ? 0.5 : 1 }]}>
+              disabled={!canDemo}
+              style={[styles.demoButton, { borderColor: theme.border, opacity: canDemo ? 1 : 0.4 }]}>
               {saveDemo.isPending ? (
                 <ActivityIndicator color={theme.textSecondary} />
               ) : (
@@ -203,15 +232,18 @@ const styles = StyleSheet.create({
   passwordInput: { paddingRight: Spacing.six },
   eye: { position: 'absolute', right: Spacing.three, top: 0, bottom: 0, justifyContent: 'center' },
   error: { marginTop: Spacing.two },
+  checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two, marginTop: Spacing.two },
+  checkboxIcon: { marginTop: 1 },
+  checkboxLabel: { flex: 1, fontSize: 13, lineHeight: 20, fontFamily: Fonts.regular },
   button: {
-    marginTop: Spacing.four,
+    marginTop: Spacing.three,
     borderRadius: Spacing.two,
     paddingVertical: Spacing.three,
     alignItems: 'center',
   },
   buttonText: { fontFamily: Fonts.bold, fontSize: 16 },
-  note: { textAlign: 'center', marginTop: Spacing.three },
-  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, marginTop: Spacing.four },
+  note: { textAlign: 'center', marginTop: Spacing.two },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, marginTop: Spacing.three },
   dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
   dividerLabel: { paddingHorizontal: Spacing.one },
   demoNote: { textAlign: 'center' },
