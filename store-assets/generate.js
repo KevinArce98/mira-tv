@@ -14,7 +14,6 @@ const mont800 = fs.readFileSync(path.join(fontDir, "mont-800.ttf")).toString("ba
 
 const copy = {
   "01-setup": { h: "Tu reproductor de medios", s: "Conecta tu servidor en segundos" },
-  "02-tv": { h: "Canales en vivo", s: "Todo al instante, sin complicaciones" },
   "03-peliculas": { h: "Tu biblioteca de películas", s: "Tu catálogo siempre contigo" },
   "04-series": { h: "Tus series favoritas", s: "Continúa donde lo dejaste" },
   "05-series-details": { h: "Explora cada título", s: "Temporadas, episodios y más" },
@@ -109,7 +108,7 @@ body::after{
 }
 </style></head><body>
 <div class="wrap">
-  <div class="mark">Mira<b> TV</b></div>
+  <div class="mark">Mi<b>ra</b></div>
   <div class="headline">${h}</div>
   <div class="sub">${s}</div>
   <div class="accent"></div>

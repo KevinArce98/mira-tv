@@ -14,11 +14,6 @@ const APPLE = 'https://devstreaming-cdn.apple.com/videos/streaming/examples';
 const AKAMAI = 'https://bitdash-a.akamaihd.net/content';
 
 const DEMO_MEDIA: Record<number, string> = {
-  1001: `${MUX}/x36xhzz/x36xhzz.m3u8`,
-  1002: `${APPLE}/img_bipbop_adv_example_ts/master.m3u8`,
-  1003: `${MUX}/tos_ismc/main.m3u8`,
-  1004: `${MUX}/pts_shift/master.m3u8`,
-
   2001: `${MUX}/x36xhzz/x36xhzz.m3u8`,
   2002: `${AKAMAI}/MI201109210084_mpeg-4/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8`,
   2003: `${AKAMAI}/sintel/hls/playlist.m3u8`,
@@ -46,13 +41,6 @@ const POSTER_TEARS_OF_STEEL = `${WIKI}/f/fe/Tears_of_Steel_frame_04_5h.jpg/500px
 const POSTER_COSMOS_LAUNDROMAT = `${WIKI}/c/c5/CosmosLaundromatPoster.jpg/500px-CosmosLaundromatPoster.jpg`;
 const POSTER_SPRING = `${WIKI}/3/30/Blender_Open_Movie_-_Spring_%282019%29.png/500px-Blender_Open_Movie_-_Spring_%282019%29.png`;
 const POSTER_CAMINANDES = `${WIKI}/a/aa/Blender_Foundation_-_Caminandes_-_Episode_3_-_Llamigos_-_Cover_thumbnail.png/500px-Blender_Foundation_-_Caminandes_-_Episode_3_-_Llamigos_-_Cover_thumbnail.png`;
-
-const DEMO_LIVE: Omit<ContentUpsert, 'cuenta_id'>[] = [
-  { tipo: 'live', stream_id: 1001, nombre: 'Demo Nature Channel',  categoria: 'Demo', categoria_id: 'demo_live', poster_url: null, container_extension: null, epg_channel_id: null },
-  { tipo: 'live', stream_id: 1002, nombre: 'Demo Test Stream',     categoria: 'Demo', categoria_id: 'demo_live', poster_url: null, container_extension: null, epg_channel_id: null },
-  { tipo: 'live', stream_id: 1003, nombre: 'Demo Cinema Live',     categoria: 'Demo', categoria_id: 'demo_live', poster_url: null, container_extension: null, epg_channel_id: null },
-  { tipo: 'live', stream_id: 1004, nombre: 'Demo Variety',         categoria: 'Demo', categoria_id: 'demo_live', poster_url: null, container_extension: null, epg_channel_id: null },
-];
 
 const DEMO_MOVIES: Omit<ContentUpsert, 'cuenta_id'>[] = [
   { tipo: 'movie', stream_id: 2001, nombre: 'Big Buck Bunny',          categoria: 'Open Movies', categoria_id: 'demo_movies', poster_url: POSTER_BIG_BUCK_BUNNY,    container_extension: 'mp4', epg_channel_id: null },
@@ -90,9 +78,8 @@ function withAccount(items: Omit<ContentUpsert, 'cuenta_id'>[], cuentaId: string
 }
 
 export async function syncDemoCatalog(cuenta: Cuenta): Promise<number> {
-  const a = await upsertContentBatch(withAccount(DEMO_LIVE, cuenta.id));
-  const b = await upsertContentBatch(withAccount(DEMO_MOVIES, cuenta.id));
-  const c = await upsertContentBatch(withAccount(DEMO_SERIES, cuenta.id));
+  const movies = await upsertContentBatch(withAccount(DEMO_MOVIES, cuenta.id));
+  const series = await upsertContentBatch(withAccount(DEMO_SERIES, cuenta.id));
   await updateLastSync(cuenta.id);
-  return a + b + c;
+  return movies + series;
 }

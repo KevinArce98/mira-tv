@@ -62,9 +62,9 @@ export default function SetupScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.flex}>
           <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-            <Ionicons name="tv-outline" size={48} color={theme.accent} style={styles.logo} />
+            <Ionicons name="play-circle-outline" size={48} color={theme.accent} style={styles.logo} />
             <ThemedText style={styles.brand}>
-              Mira<Text style={{ color: theme.accent }}> TV</Text>
+              Mira
             </ThemedText>
             <ThemedText type="subtitle" style={styles.heading}>
               {t('setup.connect')}

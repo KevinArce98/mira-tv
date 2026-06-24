@@ -26,7 +26,7 @@ export default function TabsLayout() {
         name="live"
         options={{
           title: t('tabs.live'),
-          tabBarIcon: ({ color, size }) => <Ionicons name="tv" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="radio" size={size} color={color} />,
         }}
       />
       <Tabs.Screen

@@ -4,7 +4,7 @@ type Vars = Record<string, string | number>;
 
 const es = {
   'tabs.home': 'Inicio',
-  'tabs.live': 'TV',
+  'tabs.live': 'En vivo',
   'tabs.movies': 'Películas',
   'tabs.series': 'Series',
   'tabs.search': 'Buscar',
@@ -21,10 +21,10 @@ const es = {
   'sync.series': 'Series',
   'sync.done': 'Finalizando',
 
-  'live.title': 'TV en vivo',
+  'live.title': 'En vivo',
   'live.all': 'Todos',
   'live.empty.title': 'Sin canales',
-  'live.empty.subtitle': 'Sincroniza el catálogo desde Inicio.',
+  'live.empty.subtitle': 'Tu servidor de medios no tiene canales en vivo, o aún no has sincronizado.',
 
   'catalog.all': 'Todas',
   'catalog.empty.title': 'Catálogo vacío',
@@ -41,7 +41,7 @@ const es = {
   'series.title': 'Series',
 
   'search.title': 'Buscar',
-  'search.placeholder': 'Canales, películas, series…',
+  'search.placeholder': 'Películas, series…',
   'search.prompt.title': 'Busca en todo tu catálogo',
   'search.prompt.subtitle': 'Escribe al menos 2 caracteres.',
   'search.noResults.title': 'Sin resultados',
@@ -56,8 +56,8 @@ const es = {
   'error.loadFailed.title': 'No se pudo cargar',
   'error.loadFailed.subtitle': 'Revisa tu conexión e inténtalo de nuevo.',
 
-  'setup.connect': 'Conecta tu cuenta',
-  'setup.subtitle': 'Introduce los datos de tu proveedor Xtream Codes.',
+  'setup.connect': 'Conecta tu servidor de medios',
+  'setup.subtitle': 'Mira reproduce el catálogo de tu propio servidor de medios. No incluye ni distribuye contenido.',
   'setup.server': 'Servidor',
   'setup.user': 'Usuario',
   'setup.password': 'Contraseña',
@@ -73,7 +73,7 @@ const es = {
   'setup.demoNote': '¿No tienes cuenta propia? Explora la interfaz con datos de ejemplo.',
 
   'settings.demoMode': 'Modo demo activo',
-  'settings.demoDescription': 'Los datos son de ejemplo. Cierra sesión y conecta tu cuenta para usar Mira TV.',
+  'settings.demoDescription': 'Los datos son de ejemplo. Cierra sesión y conecta tu servidor para usar Mira.',
   'settings.legal': 'Términos de Uso',
 
   'detail.resume': 'Reanudar',
@@ -130,7 +130,7 @@ type Dictionary = Record<keyof typeof es, string>;
 
 const en: Dictionary = {
   'tabs.home': 'Home',
-  'tabs.live': 'TV',
+  'tabs.live': 'Live',
   'tabs.movies': 'Movies',
   'tabs.series': 'Series',
   'tabs.search': 'Search',
@@ -147,10 +147,10 @@ const en: Dictionary = {
   'sync.series': 'Series',
   'sync.done': 'Finishing',
 
-  'live.title': 'Live TV',
+  'live.title': 'Live',
   'live.all': 'All',
   'live.empty.title': 'No channels',
-  'live.empty.subtitle': 'Sync the catalog from Home.',
+  'live.empty.subtitle': 'Your media server has no live channels, or you haven\'t synced yet.',
 
   'catalog.all': 'All',
   'catalog.empty.title': 'Empty catalog',
@@ -167,7 +167,7 @@ const en: Dictionary = {
   'series.title': 'Series',
 
   'search.title': 'Search',
-  'search.placeholder': 'Channels, movies, series…',
+  'search.placeholder': 'Movies, series…',
   'search.prompt.title': 'Search your whole catalog',
   'search.prompt.subtitle': 'Type at least 2 characters.',
   'search.noResults.title': 'No results',
@@ -182,8 +182,8 @@ const en: Dictionary = {
   'error.loadFailed.title': 'Could not load',
   'error.loadFailed.subtitle': 'Check your connection and try again.',
 
-  'setup.connect': 'Connect your account',
-  'setup.subtitle': 'Enter your Xtream Codes provider details.',
+  'setup.connect': 'Connect your media server',
+  'setup.subtitle': 'Mira plays the catalog of your own media server. It does not include or distribute any content.',
   'setup.server': 'Server',
   'setup.user': 'Username',
   'setup.password': 'Password',
@@ -199,7 +199,7 @@ const en: Dictionary = {
   'setup.demoNote': "Don't have your own account? Explore the interface with sample data.",
 
   'settings.demoMode': 'Demo mode active',
-  'settings.demoDescription': 'Data is for demonstration only. Log out and connect your account to use Mira TV.',
+  'settings.demoDescription': 'Data is for demonstration only. Log out and connect your server to use Mira.',
   'settings.legal': 'Terms of Use',
 
   'detail.resume': 'Resume',
